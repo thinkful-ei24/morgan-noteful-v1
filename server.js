@@ -10,9 +10,21 @@ const app = express();
 // Serve public files
 app.use('/', express.static('public'));
 
-// Add API endpoints
+// Add /notes/ endpoints
 app.get('/api/notes', (req, res) => {
   res.json(data);
+});
+
+app.get('/api/notes/:id', (req, res) => {
+  // fetch the ID of the requested student
+  const id = Number(req.params.id);
+  // Locate the student object in our database
+  for (const student of data) {
+    // If found, return entire student obj
+    if (student.id === id) return res.json(student);
+  }
+  // If not found, return 404 status
+  return res.sendStatus(404);
 });
 
 
