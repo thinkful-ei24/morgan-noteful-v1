@@ -12,7 +12,15 @@ app.use('/', express.static('public'));
 
 // Add /notes/ endpoints
 app.get('/api/notes', (req, res) => {
-  res.json(data);
+  // Fetch searchTerm query from client request
+  const {searchTerm} = req.query;
+  // Check if a search was requested
+  if (searchTerm) {
+    // Return the filtered data with the search term in title
+    return res.json(data.filter(item => item.title.includes(searchTerm)));
+  }
+  // Return all data otherwise
+  else return res.json(data);
 });
 
 app.get('/api/notes/:id', (req, res) => {
