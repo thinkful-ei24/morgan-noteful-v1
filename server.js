@@ -16,12 +16,12 @@ app.get('/api/notes', (req, res) => {
 });
 
 app.get('/api/notes/:id', (req, res) => {
-  // fetch the ID of the requested student
+  // fetch the ID of the requested item
   const id = Number(req.params.id);
-  // Locate the student object in our database
-  for (const student of data) {
-    // If found, return entire student obj
-    if (student.id === id) return res.json(student);
+  // Locate the item in our database
+  for (const item of data) {
+    // If found, return item obj in response
+    if (item.id === id) return res.json(item);
   }
   // If not found, return 404 status
   return res.sendStatus(404);
