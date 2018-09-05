@@ -1,4 +1,6 @@
 'use strict';
+const {logger} = require('./middleware/logger');
+const {PORT} = require('./config');
 
 // Load array of notes
 const data = require('./db/notes');
@@ -9,6 +11,9 @@ const app = express();
 
 // Serve public files
 app.use('/', express.static('public'));
+
+// Log all incoming requests
+app.use(logger);
 
 // Add /notes/ endpoints
 app.get('/api/notes', (req, res) => {
@@ -37,6 +42,6 @@ app.get('/api/notes/:id', (req, res) => {
 
 
 // Spin up static server
-app.listen(8080, function() {
+app.listen(PORT, function() {
   console.info(`Server listening on ${this.address().port}`);
 }).on('error', e => console.error(e));
