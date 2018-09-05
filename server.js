@@ -11,14 +11,17 @@ const notes = simDB.initialize(data);
 const express = require('express');
 const app = express();
 
-// Serve public files
-app.use('/', express.static('public'));
-
 // Log all incoming requests
 app.use(logger);
 
+// Serve public files
+app.use('/', express.static('public'));
+
+// Parse incoming JSON
+app.use(express.json());
+
 // Add /notes/ endpoints
-app.get('/api/notes', (req, res) => {
+app.get('/api/notes', (req, res, next) => {
   // Fetch searchTerm query from client request
   const {searchTerm} = req.query;
   // Check if a search was requested
@@ -30,16 +33,42 @@ app.get('/api/notes', (req, res) => {
   });
 });
 
-app.get('/api/notes/:id', (req, res) => {
+app.get('/api/notes/:id', (req, res, next) => {
   // fetch the ID of the requested item
-  const id = Number(req.params.id);
+  const id = req.params.id;
   // Locate the item in our database
-  for (const item of data) {
-    // If found, return item obj in response
-    if (item.id === id) return res.json(item);
-  }
-  // If not found, return 404 status
-  return res.sendStatus(404);
+  notes.find(id, (err, item) => {
+    // Throw any errors
+    if (err) next(err);
+    // If item is found, respond to request
+    else if (item !== undefined) res.json(item);
+    // Otherwise, return 404
+    else next();
+  });
+});
+
+app.put('/api/notes/:id', (req, res, next) => {
+  // grab the ID from the request
+  const id = req.params.id;
+  // Create the object which will update our DB
+  const updateObj = {};
+  // Set the legal update fields
+  const updateFields = ['title', 'content'];
+  // Iterate through legal update fields
+  updateFields.forEach(field => {
+    // If the field is in our request
+    if (field in req.body) {
+      // Push the value of the field into our update obj
+      updateObj[field] = req.body[field];
+    }
+  });
+  console.log(updateObj);
+  // update the DB with user input
+  notes.update(id, updateObj, (err, item) => {
+    if (err) next(err);
+    else if (item !== undefined) res.json(item);
+    else next();
+  });
 });
 
 // Handle invalid requests
