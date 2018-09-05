@@ -4,6 +4,8 @@ const {PORT} = require('./config');
 
 // Load array of notes
 const data = require('./db/notes');
+const simDB = require('./db/simDB'); 
+const notes = simDB.initialize(data);
 
 // Initialize an express app
 const express = require('express');
@@ -20,12 +22,12 @@ app.get('/api/notes', (req, res) => {
   // Fetch searchTerm query from client request
   const {searchTerm} = req.query;
   // Check if a search was requested
-  if (searchTerm) {
-    // Return the filtered data with the search term in title
-    return res.json(data.filter(item => item.title.includes(searchTerm)));
-  }
-  // Return all data otherwise
-  else return res.json(data);
+  notes.filter(searchTerm, (err, list) => {
+    // Throw any errors
+    if (err) next(err);
+    // Send a response if no errors
+    else res.json(list);
+  });
 });
 
 app.get('/api/notes/:id', (req, res) => {
@@ -40,10 +42,20 @@ app.get('/api/notes/:id', (req, res) => {
   return res.sendStatus(404);
 });
 
+// Handle invalid requests
 app.use((req, res, next) => {
   const err = new Error('Not Found');
   err.status = 404;
-  res.status(404).json({message: 'Not Found'});
+  next(err);
+});
+
+// Send all error responses
+app.use(function (err, req, res, next) {
+  res.status(err.status || 500); 
+  res.json({
+    message: err.message,
+    error: err
+  });
 });
 
 // Spin up static server
