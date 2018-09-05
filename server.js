@@ -62,7 +62,6 @@ app.put('/api/notes/:id', (req, res, next) => {
       updateObj[field] = req.body[field];
     }
   });
-  console.log(updateObj);
   // update the DB with user input
   notes.update(id, updateObj, (err, item) => {
     if (err) next(err);
