@@ -40,6 +40,11 @@ app.get('/api/notes/:id', (req, res) => {
   return res.sendStatus(404);
 });
 
+app.use((req, res, next) => {
+  const err = new Error('Not Found');
+  err.status = 404;
+  res.status(404).json({message: 'Not Found'});
+});
 
 // Spin up static server
 app.listen(PORT, function() {
