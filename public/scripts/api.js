@@ -33,6 +33,17 @@ const api = {
     });
   },
 
+  create: function(obj, callback) {
+    $.ajax({
+      type: 'POST',
+      url: '/api/notes/',
+      contentType: 'application/json',
+      dataType: 'json',
+      data: JSON.stringify(obj),
+      success: callback
+    });
+  },
+
   remove: function(id, callback) {
     $.ajax({
       type: 'DELETE',

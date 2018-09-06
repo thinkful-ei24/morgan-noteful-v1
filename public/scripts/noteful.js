@@ -77,11 +77,23 @@ const noteful = (function () {
 
       noteObj.id = store.currentNote.id;
 
-      api.update(noteObj.id, noteObj, updateResponse => {
-        store.currentNote = updateResponse;
+      if (noteObj.id !== undefined) {
+        // Update the DB
+        api.update(noteObj.id, noteObj, updateResponse => {
+          store.currentNote = updateResponse;
+          render();
+        });
+      }
+      // if the note does not have an id
+      else {
+        api.create(noteObj, (res) => {
+          store.currentNote = res;
+          store.notes.push(res);
+          render();
+        });
+      }
 
-        render();
-      });
+      
     });
   }
 
@@ -89,8 +101,8 @@ const noteful = (function () {
     $('.js-start-new-note-form').on('submit', event => {
       event.preventDefault();
 
-      console.log('Start New Note, coming soon...');
-
+      store.currentNote = {};
+      render();
     });
   }
 
