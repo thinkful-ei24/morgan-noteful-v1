@@ -1,10 +1,10 @@
-'use strict';
-const {logger} = require('./middleware/logger');
 const {PORT} = require('./config');
+const morgan = require('morgan');
 
 // Load array of notes
 const data = require('./db/notes');
-const simDB = require('./db/simDB'); 
+// const notes = require('./db/simDB').initialize(data); 
+const simDB = require('./db/simDB');
 const notes = simDB.initialize(data);
 
 // Initialize an express app
@@ -12,7 +12,7 @@ const express = require('express');
 const app = express();
 
 // Log all incoming requests
-app.use(logger);
+app.use(morgan('dev'));
 
 // Serve public files
 app.use('/', express.static('public'));
@@ -47,6 +47,9 @@ app.get('/api/notes/:id', (req, res, next) => {
   });
 });
 
+// Think about composing a function that returns a doctorObject() function
+  // Think of composition as combining abilities
+  // Factory function pattern?
 app.put('/api/notes/:id', (req, res, next) => {
   // grab the ID from the request
   const id = req.params.id;
@@ -74,11 +77,12 @@ app.put('/api/notes/:id', (req, res, next) => {
 app.use((req, res, next) => {
   const err = new Error('Not Found');
   err.status = 404;
+  // Send invalid request to next error handler
   next(err);
 });
 
 // Send all error responses
-app.use(function (err, req, res, next) {
+app.use( (err, req, res, next) => {
   res.status(err.status || 500); 
   res.json({
     message: err.message,
