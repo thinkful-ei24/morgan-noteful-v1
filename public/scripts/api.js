@@ -1,6 +1,6 @@
 /* global $ */
-'use strict';
 
+// eslint-disable-next-line
 const api = {
 
   search: function (query, callback) {
@@ -29,6 +29,15 @@ const api = {
       contentType: 'application/json',
       dataType: 'json',
       data: JSON.stringify(obj),
+      success: callback
+    });
+  },
+
+  remove: function(id, callback) {
+    $.ajax({
+      type: 'DELETE',
+      url: `/api/notes/${id}`,
+      dataType: 'json',
       success: callback
     });
   }

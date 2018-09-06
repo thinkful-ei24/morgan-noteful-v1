@@ -1,6 +1,6 @@
 /* global $ store api */
-'use strict';
 
+// eslint-disable-next-line
 const noteful = (function () {
 
   function render() {
@@ -95,11 +95,20 @@ const noteful = (function () {
   }
 
   function handleNoteDeleteClick() {
-    $('.js-notes-list').on('click', '.js-note-delete-button', event => {
+    $('.js-notes-list').on('click', '.js-note-delete-button', (e) => {
       event.preventDefault();
-
-      console.log('Delete Note, coming soon...');
-      
+      // Get ID of item clicked
+      const id = $(e.target).parent('li').data('id');
+      // update the DB
+      api.remove(id, () => {
+        // On success...
+        // Find the item in the store
+        const index = store.notes.findIndex(item => item.id === id);
+        // Remove it from the store
+        store.notes.splice(index, 1);
+        // Render new view
+        render();
+      });
     });
   }
 
