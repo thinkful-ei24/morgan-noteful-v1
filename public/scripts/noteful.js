@@ -118,6 +118,8 @@ const noteful = (function () {
         const index = store.notes.findIndex(item => item.id === id);
         // Remove it from the store
         store.notes.splice(index, 1);
+        // set correct currentNote state
+        if (store.currentNote.id === id) store.currentNote = {};
         // Render new view
         render();
       });
