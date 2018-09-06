@@ -24,6 +24,23 @@ router.get('/', (req, res, next) => {
   });
 });
 
+router.post('/', (req, res, next) => {
+  const content = {
+    title: req.body.title,
+    content: req.body.content,
+  };
+  if (!content.title) {
+    const err = new Error('Title Required');
+    err.status = 400;
+    next(err);
+  }
+  notes.create(content, (err, item) => {
+    if (err) next(err);
+    else if (item !== undefined) res.json(item);
+    else next();
+  });
+});
+
 router.get('/:id', (req, res, next) => {
   // fetch the ID of the requested item
   const id = req.params.id;
@@ -61,6 +78,17 @@ router.put('/:id', (req, res, next) => {
     if (err) next(err);
     else if (item !== undefined) res.json(item);
     else next();
+  });
+});
+
+router.delete('/:id', (req, res, next) => {
+  const id = req.params.id;
+  notes.delete(id, (err, len) => {
+    if (err) next(err);
+    else if (len !== null) res.status(204).end();
+    else {
+      next();
+    }
   });
 });
 
