@@ -16,12 +16,9 @@ router.get('/', (req, res, next) => {
   // Fetch searchTerm query from client request
   const {searchTerm} = req.query;
   // Check if a search was requested
-  notes.filter(searchTerm, (err, list) => {
-    // Throw any errors
-    if (err) next(err);
-    // Send a response if no errors
-    else res.json(list);
-  });
+  notes.filter(searchTerm)
+    .then(list => res.json(list))
+    .catch(err => next(err));
 });
 
 router.post('/', (req, res, next) => {
@@ -34,25 +31,23 @@ router.post('/', (req, res, next) => {
     err.status = 400;
     next(err);
   }
-  notes.create(content, (err, item) => {
-    if (err) next(err);
-    else if (item !== undefined) res.json(item);
-    else next();
-  });
+  notes.create(content)
+    .then(item => res.status(201).json(item))
+    .catch(err => next(err));
 });
 
 router.get('/:id', (req, res, next) => {
   // fetch the ID of the requested item
   const id = req.params.id;
   // Locate the item in our database
-  notes.find(id, (err, item) => {
-    // Throw any errors
-    if (err) next(err);
-    // If item is found, respond to request
-    else if (item !== undefined) res.json(item);
-    // Otherwise, return 404
-    else next();
-  });
+  notes.find(id)
+    .then(item => {
+      // If item is found, respond to request
+      if (item !== undefined) res.json(item);
+      // Otherwise, return 404
+      else next();
+    })
+    .catch(err => next(err));
 });
 
 router.put('/:id', (req, res, next) => {
@@ -71,22 +66,19 @@ router.put('/:id', (req, res, next) => {
     }
   });
   // update the DB with user input
-  notes.update(id, updateObj, (err, item) => {
-    if (err) next(err);
-    else if (item !== undefined) res.json(item);
-    else next();
-  });
+  notes.update(id, updateObj)
+    .then(item => res.status(200).json(item))
+    .catch(err => next(err));
 });
 
 router.delete('/:id', (req, res, next) => {
   const id = req.params.id;
-  notes.delete(id, (err, len) => {
-    if (err) next(err);
-    else if (len !== null) res.status(204).end();
-    else {
-      next();
-    }
-  });
+  notes.delete(id)
+    .then((len) => {
+      if (len !== null) res.status(204).end();
+      else next();
+    })
+    .catch(err => next(err));
 });
 
 module.exports = router;
