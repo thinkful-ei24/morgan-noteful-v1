@@ -55,9 +55,6 @@ router.get('/:id', (req, res, next) => {
   });
 });
 
-// Think about composing a function that returns a doctorObject() function
-  // Think of composition as combining abilities
-  // Factory function pattern?
 router.put('/:id', (req, res, next) => {
   // grab the ID from the request
   const id = req.params.id;
@@ -91,6 +88,5 @@ router.delete('/:id', (req, res, next) => {
     }
   });
 });
-
 
 module.exports = router;

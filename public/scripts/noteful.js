@@ -70,6 +70,8 @@ const noteful = (function () {
       event.preventDefault();
       const editForm = $(event.currentTarget);
 
+      console.dir(event.currentTarget);
+
       const noteObj = {
         title: editForm.find('.js-note-title-entry').val(),
         content: editForm.find('.js-note-content-entry').val()
