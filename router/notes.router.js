@@ -67,7 +67,10 @@ router.put('/:id', (req, res, next) => {
   });
   // update the DB with user input
   notes.update(id, updateObj)
-    .then(item => res.status(200).json(item))
+    .then(item => {
+      if (item === undefined) next();
+      else res.status(200).json(item);
+    })
     .catch(err => next(err));
 });
 
