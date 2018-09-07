@@ -42,11 +42,11 @@ const noteful = (function () {
 
       const noteId = getNoteIdFromElement(event.currentTarget);
 
-      api.details(noteId, detailsResponse => {
-        store.currentNote = detailsResponse;
-        render();
-      });
-
+      api.details(noteId)
+        .then(detailsResponse => {
+          store.currentNote = detailsResponse;
+          render();
+        });
     });
   }
 
@@ -57,10 +57,11 @@ const noteful = (function () {
       const searchTerm = $('.js-note-search-entry').val();
       store.currentSearchTerm = searchTerm ? { searchTerm } : {};
 
-      api.search(store.currentSearchTerm, searchResponse => {
-        store.notes = searchResponse;
-        render();
-      });
+      api.search(store.currentSearchTerm)
+        .then(searchResponse => {
+          store.notes = searchResponse;
+          render();
+        });
 
     });
   }
@@ -81,21 +82,21 @@ const noteful = (function () {
 
       if (noteObj.id !== undefined) {
         // Update the DB
-        api.update(noteObj.id, noteObj, updateResponse => {
-          store.currentNote = updateResponse;
-          render();
-        });
+        api.update(noteObj.id, noteObj)
+          .then(updateResponse => {
+            store.currentNote = updateResponse;
+            render();
+          });
       }
       // if the note does not have an id
       else {
-        api.create(noteObj, (res) => {
-          store.currentNote = res;
-          store.notes.push(res);
-          render();
-        });
+        api.create(noteObj)
+          .then((res) => {
+            store.currentNote = res;
+            store.notes.push(res);
+            render();
+          });
       }
-
-      
     });
   }
 
@@ -114,17 +115,18 @@ const noteful = (function () {
       // Get ID of item clicked
       const id = $(e.target).parent('li').data('id');
       // update the DB
-      api.remove(id, () => {
-        // On success...
-        // Find the item in the store
-        const index = store.notes.findIndex(item => item.id === id);
-        // Remove it from the store
-        store.notes.splice(index, 1);
-        // set correct currentNote state
-        if (store.currentNote.id === id) store.currentNote = {};
-        // Render new view
-        render();
-      });
+      api.remove(id)
+        .then(() => {
+          // On success...
+          // Find the item in the store
+          const index = store.notes.findIndex(item => item.id === id);
+          // Remove it from the store
+          store.notes.splice(index, 1);
+          // set correct currentNote state
+          if (store.currentNote.id === id) store.currentNote = {};
+          // Render new view
+          render();
+        });
     });
   }
 
